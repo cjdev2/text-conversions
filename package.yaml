@@ -1,0 +1,49 @@
+name: text-conversions
+version: '0.1.0'
+category: Data
+synopsis: Safe conversions between textual types
+description: Safe conversions between textual types
+license: ISC
+author: Alexis King
+maintainer: lexi.lambda@gmail.com
+
+github: cjdev/text-conversions
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+- LICENSE
+- package.yaml
+- stack.yaml
+
+ghc-options: -Wall
+default-extensions:
+- FlexibleContexts
+- FlexibleInstances
+- MultiParamTypeClasses
+- OverloadedStrings
+- ScopedTypeVariables
+
+library:
+  source-dirs: src
+  dependencies:
+  - base >= 4.7 && < 5
+  - bytestring
+  - errors
+  - text
+
+tests:
+  text-conversions-test-suite:
+    source-dirs: test
+    main: Main.hs
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    dependencies:
+    - base
+    - text-conversions
+    - bytestring
+    - hspec
+    - hspec-discover
+    - text
