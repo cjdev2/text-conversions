@@ -21,3 +21,7 @@ Just "hello"
 > convertText (UTF8 ("\xc3\x28" :: ByteString)) :: Maybe Text
 Nothing
 ```
+
+[For more details, see the documentation on Hackage.][hackage]
+
+[hackage]: https://hackage.haskell.org/package/text-conversions
