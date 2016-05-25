@@ -1,21 +1,13 @@
-module Data.Text.ConversionsSpec where
+module Data.Text.ConversionsSpec (spec) where
 
 import Test.Hspec
 import Data.Text.Conversions
-
-import Data.String (IsString(..))
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-
-data BoringString = BoringString
-  deriving (Eq, Show)
-
-instance IsString BoringString where
-  fromString _ = BoringString
 
 newtype Upper = Upper T.Text deriving (Eq, Show)
 newtype Lower = Lower T.Text deriving (Eq, Show)
