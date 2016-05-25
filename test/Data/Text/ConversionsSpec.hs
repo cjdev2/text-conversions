@@ -21,9 +21,15 @@ data FailableString = FailableString
 instance DecodeText Maybe FailableString where
   decodeText _ = Just "failable"
 
+data FailableRepresentation = FailableRepresentation
+  deriving (Eq, Show)
+
+instance FromText (Maybe FailableRepresentation) where
+  fromText _ = Just FailableRepresentation
+
 spec :: Spec
 spec = do
-  describe "ConvertText" $ do
+  describe "convertText" $ do
     it "can convert strings to and from text" $ do
       convertText ("hello" :: String) `shouldBe` ("hello" :: T.Text)
       convertText ("hello" :: T.Text) `shouldBe` ("hello" :: String)
@@ -35,18 +41,23 @@ spec = do
     it "can convert between things with ToText/FromText conversions" $
       convertText (Upper "HELLO") `shouldBe` Lower "hello"
 
-    it "can convert between things in functors with a DecodeText instance" $
-      convertText FailableString `shouldBe` Just ("failable" :: TL.Text)
+    it "can convert between things with FromText instances that produce functors" $
+      convertText ("hello" :: T.Text) `shouldBe` Just FailableRepresentation
 
-    describe "UTF8" $ do
-      it "successfully decodes properly encoded bytestrings" $ do
-        convertText (UTF8 ("hello" :: B.ByteString)) `shouldBe` Just ("hello" :: T.Text)
-        convertText (UTF8 ("hello" :: BL.ByteString)) `shouldBe` Just ("hello" :: T.Text)
-
-      it "fails to decode improperly encoded bytestrings" $ do
-        convertText (UTF8 ("invalid \xc3\x28" :: B.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
-        convertText (UTF8 ("invalid \xc3\x28" :: BL.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
-
+    describe "UTF8" $
       it "properly encodes text as bytestrings" $ do
         convertText ("hello" :: T.Text) `shouldBe` UTF8 ("hello" :: B.ByteString)
         convertText ("hello" :: T.Text) `shouldBe` UTF8 ("hello" :: BL.ByteString)
+
+  describe "decodeConvertText" $ do
+    it "can convert between things in functors with a DecodeText instance" $
+      decodeConvertText FailableString `shouldBe` Just ("failable" :: TL.Text)
+
+    describe "UTF8" $ do
+      it "successfully decodes properly encoded bytestrings" $ do
+        decodeConvertText (UTF8 ("hello" :: B.ByteString)) `shouldBe` Just ("hello" :: T.Text)
+        decodeConvertText (UTF8 ("hello" :: BL.ByteString)) `shouldBe` Just ("hello" :: T.Text)
+
+      it "fails to decode improperly encoded bytestrings" $ do
+        decodeConvertText (UTF8 ("invalid \xc3\x28" :: B.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
+        decodeConvertText (UTF8 ("invalid \xc3\x28" :: BL.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)

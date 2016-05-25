@@ -24,24 +24,25 @@
 
   Most of the time, you will not need to create your own instances or use the
   underlying functions that make the conversion machinery tick. Instead, just
-  use the 'convertText' method to automatically convert between two textual
-  datatypes automatically, whatever they may be.
+  use the 'convertText' method to convert between two textual datatypes or the
+  'decodeConvertText' method to perform a conversion that can fail.
 
   Examples:
 
   >>> convertText ("hello" :: String) :: Text
   "hello"
-  >>> convertText (UTF8 ("hello" :: ByteString)) :: Maybe Text
+  >>> decodeConvertText (UTF8 ("hello" :: ByteString)) :: Maybe Text
   Just "hello"
-  >>> convertText (UTF8 ("\xc3\x28" :: ByteString)) :: Maybe Text
+  >>> decodeConvertText (UTF8 ("\xc3\x28" :: ByteString)) :: Maybe Text
   Nothing
 -}
 module Data.Text.Conversions
-  ( ConvertText(..)
-  , DecodeText(..)
+  ( DecodeText(..)
   , FromText(..)
   , ToText(..)
   , UTF8(..)
+  , convertText
+  , decodeConvertText
   ) where
 
 import Control.Error.Util (hush)
@@ -64,9 +65,8 @@ newtype UTF8 a = UTF8 { unUTF8 :: a }
 {-|
   A simple typeclass that handles converting arbitrary datatypes to
   'Data.Text.Text' when the operation cannot fail. If you have a type that
-  satisfies that requirement, implement this typeclass, /not/ 'ConvertText'.
-  However, you probably do not want to call 'toText' directly; call
-  'convertText', instead.
+  satisfies that requirement, implement this typeclass, but if the operation can
+  fail, use 'DecodeText' instead.
 -}
 class ToText a where
   toText :: a -> T.Text
@@ -82,50 +82,36 @@ class FromText a where
 
 {-|
   A simple typeclass that handles converting arbitrary datatypes to
-  'Data.Text.Text' when the operation can fail (the functor in question is
-  expected to be 'Data.Maybe.Maybe' or 'Data.Either.Either'). If you have a type
-  that satisfies that requirement, implement this typeclass, /not/
-  'ConvertText'. However, you probably do not want to call 'decodeText'
-  directly; call 'convertText', instead.
+  'Data.Text.Text' when the operation can fail. If you have a type that
+  satisfies that requirement, implement this typeclass, but if the operation
+  cannot fail, use 'ToText' instead.
 -}
 class Functor f => DecodeText f a where
   decodeText :: a -> f T.Text
 
 {-|
-  A typeclass that provides a way to /safely/ convert between arbitrary textual
-  datatypes, including conversions that can potentially fail.
-  __Do not implement this typeclass directly__, implement 'ToText', 'FromText',
-  or 'DecodeText', instead, which this typeclass defers to. Use the
-  'convertText' function to actually perform conversions.
-
-  At a basic level, 'convertText' can convert between textual types, like
-  between 'String' and 'Data.Text.Text':
+  A function that provides a way to /safely/ convert between arbitrary textual
+  datatypes where the conversion to text cannot fail.
 
   >>> convertText ("hello" :: String) :: Text
   "hello"
+-}
+convertText :: (ToText a, FromText b) => a -> b
+convertText = fromText . toText
 
-  More interestingly, 'convertText' can also convert between binary data and
-  textual data in the form of 'Data.ByteString.ByteString'. Since binary data
-  can represent text in many different potential encodings, it is necessary to
-  use a newtype that picks the particular encoding, like 'UTF8':
+
+{-|
+  A function that provides a way to /safely/ convert between arbitrary textual
+  datatypes where the conversion to text can fail, such as decoding binary data
+  to text. Since binary data can represent text in many different potential
+  encodings, it is necessary to use a newtype that picks the particular
+  encoding, like 'UTF8':
 
   >>> convertText (UTF8 ("hello" :: ByteString)) :: Maybe Text
   Just "hello"
-
-  Note that the result of converting a 'Data.ByteString.ByteString' is a 'Maybe'
-  'Data.Text.Text' since the decoding can fail.
 -}
-class ConvertText a b where
-  convertText :: a -> b
-
-instance (ToText a, FromText b) => ConvertText a b where
-  convertText = fromText . toText
-
-instance {-# OVERLAPPING #-} (DecodeText Maybe a, FromText b) => ConvertText a (Maybe b) where
-  convertText = fmap fromText . decodeText
-
-instance {-# OVERLAPPING #-} (DecodeText (Either e) a, FromText b) => ConvertText a (Either e b) where
-  convertText = fmap fromText . decodeText
+decodeConvertText :: (DecodeText f a, FromText b) => a -> f b
+decodeConvertText = fmap fromText . decodeText
 
 instance ToText   T.Text  where toText   = id
 instance FromText T.Text  where fromText = id
