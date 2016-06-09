@@ -1,5 +1,5 @@
 name: text-conversions
-version: '0.2.0'
+version: '0.3.0'
 category: Data
 synopsis: Safe conversions between textual types
 description: Safe conversions between textual types
