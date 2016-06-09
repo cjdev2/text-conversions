@@ -1,4 +1,3 @@
-{-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveFunctor #-}
 
 {-|
@@ -37,7 +36,9 @@
   Nothing
 -}
 module Data.Text.Conversions
-  ( DecodeText(..)
+  ( Base16(..)
+  , Base64(..)
+  , DecodeText(..)
   , FromText(..)
   , ToText(..)
   , UTF8(..)
@@ -55,11 +56,30 @@ import qualified Data.Text.Lazy.Encoding as TL
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 
+import qualified Data.ByteString.Base16 as Base16
+import qualified Data.ByteString.Base16.Lazy as Base16L
+import qualified Data.ByteString.Base64 as Base64
+import qualified Data.ByteString.Base64.Lazy as Base64L
+
 {-|
   Simple wrapper type that is used to select a desired encoding when encoding or
   decoding text from binary data, such as 'Data.ByteString.ByteString's.
 -}
 newtype UTF8 a = UTF8 { unUTF8 :: a }
+  deriving (Eq, Show, Functor)
+
+{-|
+  Wrapper type used to select a base 16 encoding when encoding or decoding
+  binary data. Safe because base 16 encoding will always produce ASCII output.
+-}
+newtype Base16 a = Base16 { unBase16 :: a }
+  deriving (Eq, Show, Functor)
+
+{-|
+  Wrapper type used to select a base 64 encoding when encoding or decoding
+  binary data. Safe because base 64 encoding will always produce ASCII output.
+-}
+newtype Base64 a = Base64 { unBase64 :: a }
   deriving (Eq, Show, Functor)
 
 {-|
@@ -124,3 +144,27 @@ instance DecodeText Maybe (UTF8 B.ByteString)  where decodeText = hush . T.decod
 instance FromText         (UTF8 B.ByteString)  where fromText   = UTF8 . T.encodeUtf8
 instance DecodeText Maybe (UTF8 BL.ByteString) where decodeText = hush . fmap TL.toStrict . TL.decodeUtf8' . unUTF8
 instance FromText         (UTF8 BL.ByteString) where fromText   = UTF8 . TL.encodeUtf8 . TL.fromStrict
+
+instance ToText (Base16 B.ByteString) where
+  toText = T.decodeUtf8 . Base16.encode . unBase16
+instance FromText (Maybe (Base16 B.ByteString)) where
+  fromText txt = case Base16.decode (T.encodeUtf8 txt) of
+    (bs, "") -> Just $ Base16 bs
+    (_,  _)  -> Nothing
+
+instance ToText (Base64 B.ByteString) where
+  toText = T.decodeUtf8 . Base64.encode . unBase64
+instance FromText (Maybe (Base64 B.ByteString)) where
+  fromText = fmap Base64 . hush . Base64.decode . T.encodeUtf8
+
+instance ToText (Base16 BL.ByteString) where
+  toText = TL.toStrict . TL.decodeUtf8 . Base16L.encode . unBase16
+instance FromText (Maybe (Base16 BL.ByteString)) where
+  fromText txt = case Base16L.decode (TL.encodeUtf8 $ TL.fromStrict txt) of
+    (bs, "") -> Just $ Base16 bs
+    (_,  _)  -> Nothing
+
+instance ToText (Base64 BL.ByteString) where
+  toText = TL.toStrict . TL.decodeUtf8 . Base64L.encode . unBase64
+instance FromText (Maybe (Base64 BL.ByteString)) where
+  fromText = fmap Base64 . hush . Base64L.decode . TL.encodeUtf8 . TL.fromStrict
