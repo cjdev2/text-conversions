@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (June 9, 2016)
+
+### New Features
+
+- The `Base16` and `Base64` newtypes are now provided for managing safe conversions between binary data and Base16 and Base64 textual encodings of that data.
+
 ## 0.2.0 (May 25, 2016)
 
 ### Breaking Changes
