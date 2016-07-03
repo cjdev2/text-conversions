@@ -127,7 +127,7 @@ convertText = fromText . toText
   encodings, it is necessary to use a newtype that picks the particular
   encoding, like 'UTF8':
 
-  >>> convertText (UTF8 ("hello" :: ByteString)) :: Maybe Text
+  >>> decodeConvertText (UTF8 ("hello" :: ByteString)) :: Maybe Text
   Just "hello"
 -}
 decodeConvertText :: (DecodeText f a, FromText b) => a -> f b
