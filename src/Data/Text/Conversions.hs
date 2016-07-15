@@ -4,18 +4,17 @@
   Module: Data.Text.Conversions
 
   This module provides a set of typeclasses for safely converting between
-  textual data. The built-in 'String' type, as well as strict 'Data.Text.Text'
-  and lazy 'Data.Text.Lazy.Text', are safely convertible between one another.
-  The 'Data.ByteString.ByteString' type is frequently treated in much the same
-  manner, but this is unsafe for two reasons:
+  textual data. The built-in 'String' type, as well as strict 'T.Text' and lazy
+  'TL.Text', are safely convertible between one another. The 'B.ByteString' type
+  is frequently treated in much the same manner, but this is unsafe for two
+  reasons:
 
-  * Since 'Data.ByteString.ByteString' encodes binary data, it does not specify
-    a particular encoding, so assuming a particular encoding like UTF-8 would
-    be incorrect.
+  * Since 'B.ByteString' encodes binary data, it does not specify a particular
+    encoding, so assuming a particular encoding like UTF-8 would be incorrect.
 
   * Furthermore, decoding binary data into text given a particular encoding can
-    fail. Most systems simply use 'Data.Text.Encoding.decodeUtf8' and similar
-    functions, which will dangerously throw exceptions when given invalid data.
+    fail. Most systems simply use 'T.decodeUtf8' and similar functions, which
+    will dangerously throw exceptions when given invalid data.
 
   This module addresses both problems by providing a 'DecodeText' typeclass for
   decoding binary data in a way that can fail and by providing a 'UTF8' wrapper
@@ -35,15 +34,17 @@
   >>> decodeConvertText (UTF8 ("\xc3\x28" :: ByteString)) :: Maybe Text
   Nothing
 -}
-module Data.Text.Conversions
-  ( Base16(..)
-  , Base64(..)
-  , DecodeText(..)
-  , FromText(..)
+module Data.Text.Conversions (
+  -- * Conversion typeclasses and functions
+    FromText(..)
   , ToText(..)
-  , UTF8(..)
+  , DecodeText(..)
   , convertText
   , decodeConvertText
+  -- * Encoding newtypes
+  , UTF8(..)
+  , Base16(..)
+  , Base64(..)
   ) where
 
 import Control.Error.Util (hush)
@@ -63,7 +64,16 @@ import qualified Data.ByteString.Base64.Lazy as Base64L
 
 {-|
   Simple wrapper type that is used to select a desired encoding when encoding or
-  decoding text from binary data, such as 'Data.ByteString.ByteString's.
+  decoding text from binary data, such as 'B.ByteString's. The conversion is not
+  partial; it will result in 'Nothing' when a 'B.ByteString' is provided with
+  data that is not valid in UTF-8.
+
+  >>> convertText ("hello" :: Text) :: UTF8 ByteString
+  UTF8 "hello"
+  >>> decodeConvertText (UTF8 ("hello" :: ByteString)) :: Maybe Text
+  Just "hello"
+  >>> decodeConvertText (UTF8 ("invalid \xc3\x28" :: ByteString)) :: Maybe Text
+  Nothing
 -}
 newtype UTF8 a = UTF8 { unUTF8 :: a }
   deriving (Eq, Show, Functor)
@@ -83,28 +93,28 @@ newtype Base64 a = Base64 { unBase64 :: a }
   deriving (Eq, Show, Functor)
 
 {-|
-  A simple typeclass that handles converting arbitrary datatypes to
-  'Data.Text.Text' when the operation cannot fail. If you have a type that
-  satisfies that requirement, implement this typeclass, but if the operation can
-  fail, use 'DecodeText' instead.
+  A simple typeclass that handles converting arbitrary datatypes to 'T.Text'
+  when the operation cannot fail. If you have a type that satisfies that
+  requirement, implement this typeclass, but if the operation can fail, use
+  'DecodeText' instead.
 -}
 class ToText a where
   toText :: a -> T.Text
 
 {-|
-  A simple typeclass that handles converting 'Data.Text.Text' to arbitrary
-  datatypes. If you have a type that can be produced from text, implement this
-  typeclass, /not/ 'ConvertText'. However, you probably do not want to call
-  'fromText' directly; call 'convertText', instead.
+  A simple typeclass that handles converting 'T.Text' to arbitrary datatypes. If
+  you have a type that can be produced from text, implement this typeclass.
+  However, you probably do not want to call 'fromText' directly; call
+  'convertText', instead.
 -}
 class FromText a where
   fromText :: T.Text -> a
 
 {-|
   A simple typeclass that handles converting arbitrary datatypes to
-  'Data.Text.Text' when the operation can fail. If you have a type that
-  satisfies that requirement, implement this typeclass, but if the operation
-  cannot fail, use 'ToText' instead.
+  'T.Text' when the operation can fail. If you have a type that satisfies that
+  requirement, implement this typeclass, but if the operation cannot fail, use
+  'ToText' instead.
 -}
 class Functor f => DecodeText f a where
   decodeText :: a -> f T.Text
