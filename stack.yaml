@@ -1,7 +1,1 @@
-resolver: lts-5.18
-
-packages: ['.']
-extra-deps: []
-
-flags: {}
-extra-package-dbs: []
+stack-7.10.yaml

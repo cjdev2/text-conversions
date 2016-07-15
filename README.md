@@ -1,4 +1,4 @@
-# text-conversions
+# text-conversions [![Build Status](https://travis-ci.org/cjdev/text-conversions.svg?branch=master)](https://travis-ci.org/cjdev/text-conversions)
 
 This is a small library to ease the pain when converting between the many different string types in Haskell. Unlike some other libraries that attempt to solve the same problem, text-conversions is:
 
