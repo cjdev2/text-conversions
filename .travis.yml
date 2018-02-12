@@ -10,17 +10,25 @@ cache:
 # cache file per set of arguments.
 matrix:
   include:
-  - env: ARGS="--stack-yaml stack-7.10.yaml"
+  - env: ARGS="--resolver lts-6"
     compiler: ": #stack 7.10.3"
-    addons: { apt: { packages: [ghc-7.10.3], sources: [hvr-ghc] } }
+    addons: { apt: { packages: [libgmp-dev] } }
 
-  - env: ARGS="--stack-yaml stack-8.0.yaml"
+  - env: ARGS="--resolver lts-7"
     compiler: ": #stack 8.0.1"
-    addons: { apt: { packages: [ghc-8.0.1], sources: [hvr-ghc] } }
+    addons: { apt: { packages: [libgmp-dev] } }
+
+  - env: ARGS="--resolver lts-9"
+    compiler: ": #stack 8.0.2"
+    addons: { apt: { packages: [libgmp-dev] } }
+
+  - env: ARGS="--resolver lts-10"
+    compiler: ": #stack 8.0.2"
+    addons: { apt: { packages: [libgmp-dev] } }
 
   - env: ARGS="--resolver nightly"
     compiler: ": #stack nightly"
-    addons: { apt: { packages: [libgmp,libgmp-dev] } }
+    addons: { apt: { packages: [libgmp-dev] } }
 
   allow_failures:
   # Nightly builds are allowed to fail
@@ -36,7 +44,7 @@ before_install:
 - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
 install:
-- stack --no-terminal --install-ghc $ARGS test --bench --only-dependencies
+- stack --no-terminal $ARGS test --bench --only-dependencies
 
 script:
 - stack --no-terminal $ARGS test --bench --no-run-benchmarks --haddock --no-haddock-deps --ghc-options=-Werror

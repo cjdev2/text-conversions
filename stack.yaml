@@ -1,1 +1,7 @@
-stack-7.10.yaml
+resolver: lts-10.5
+
+packages: ['.']
+extra-deps: []
+
+flags: {}
+extra-package-dbs: []
