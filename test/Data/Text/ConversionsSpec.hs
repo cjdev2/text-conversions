@@ -1,13 +1,15 @@
 module Data.Text.ConversionsSpec (spec) where
 
-import Test.Hspec
-import Data.Text.Conversions
+import           Data.Text.Conversions
+import           Test.Hspec
 
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
+import qualified Data.Text             as T
+import qualified Data.Text.Lazy        as TL
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString       as B
+import qualified Data.ByteString.Lazy  as BL
+
+import           Data.Either           ( isLeft )
 
 newtype Upper = Upper T.Text deriving (Eq, Show)
 newtype Lower = Lower T.Text deriving (Eq, Show)
@@ -29,6 +31,18 @@ instance FromText (Maybe FailableRepresentation) where
 
 spec :: Spec
 spec = do
+  describe "decodeText" $ do
+
+    describe "(Either UnicodeException) (UTF8 ByteString) instance" $ do
+
+     it "successfully decodes properly encoded bytestrings" $ do
+       decodeText (UTF8 ("hello" :: B.ByteString)) `shouldBe` Right ("hello" :: T.Text)
+       decodeText (UTF8 ("hello" :: BL.ByteString)) `shouldBe` Right ("hello" :: T.Text)
+
+     it "fails to decode improperly encoded bytestrings" $ do
+       decodeConvertText (UTF8 ("invalid \xc3\x28" :: B.ByteString))  `shouldSatisfy` (isLeft :: Either UnicodeException T.Text -> Bool)
+       decodeConvertText (UTF8 ("invalid \xc3\x28" :: BL.ByteString)) `shouldSatisfy` (isLeft :: Either UnicodeException T.Text -> Bool)
+
   describe "convertText" $ do
     it "can convert strings to and from text" $ do
       convertText ("hello" :: String) `shouldBe` ("hello" :: T.Text)
@@ -83,7 +97,6 @@ spec = do
       it "successfully decodes properly encoded bytestrings" $ do
         decodeConvertText (UTF8 ("hello" :: B.ByteString)) `shouldBe` Just ("hello" :: T.Text)
         decodeConvertText (UTF8 ("hello" :: BL.ByteString)) `shouldBe` Just ("hello" :: T.Text)
-
       it "fails to decode improperly encoded bytestrings" $ do
         decodeConvertText (UTF8 ("invalid \xc3\x28" :: B.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
         decodeConvertText (UTF8 ("invalid \xc3\x28" :: BL.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
