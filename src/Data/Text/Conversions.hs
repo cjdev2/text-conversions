@@ -45,22 +45,26 @@ module Data.Text.Conversions (
   , UTF8(..)
   , Base16(..)
   , Base64(..)
+  -- * Re-exports
+  , UnicodeException(..)
   ) where
 
-import Control.Error.Util (hush)
+import           Control.Error.Util          ( hush )
 
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TL
+import qualified Data.Text                   as T
+import qualified Data.Text.Encoding          as T
+import qualified Data.Text.Lazy              as TL
+import qualified Data.Text.Lazy.Encoding     as TL
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString             as B
+import qualified Data.ByteString.Lazy        as BL
 
-import qualified Data.ByteString.Base16 as Base16
+import qualified Data.ByteString.Base16      as Base16
 import qualified Data.ByteString.Base16.Lazy as Base16L
-import qualified Data.ByteString.Base64 as Base64
+import qualified Data.ByteString.Base64      as Base64
 import qualified Data.ByteString.Base64.Lazy as Base64L
+
+import           Data.Text.Encoding.Error    ( UnicodeException(..) )
 
 {-|
   Simple wrapper type that is used to select a desired encoding when encoding or
@@ -154,6 +158,10 @@ instance DecodeText Maybe (UTF8 B.ByteString)  where decodeText = hush . T.decod
 instance FromText         (UTF8 B.ByteString)  where fromText   = UTF8 . T.encodeUtf8
 instance DecodeText Maybe (UTF8 BL.ByteString) where decodeText = hush . fmap TL.toStrict . TL.decodeUtf8' . unUTF8
 instance FromText         (UTF8 BL.ByteString) where fromText   = UTF8 . TL.encodeUtf8 . TL.fromStrict
+instance (e ~ UnicodeException) => DecodeText (Either e) (UTF8 B.ByteString) where
+  decodeText = T.decodeUtf8' . unUTF8
+instance (e ~ UnicodeException) => DecodeText (Either e) (UTF8 BL.ByteString) where
+  decodeText = T.decodeUtf8' . BL.toStrict . unUTF8
 
 instance ToText (Base16 B.ByteString) where
   toText = T.decodeUtf8 . Base16.encode . unBase16
@@ -178,3 +186,4 @@ instance ToText (Base64 BL.ByteString) where
   toText = TL.toStrict . TL.decodeUtf8 . Base64L.encode . unBase64
 instance FromText (Maybe (Base64 BL.ByteString)) where
   fromText = fmap Base64 . hush . Base64L.decode . TL.encodeUtf8 . TL.fromStrict
+
