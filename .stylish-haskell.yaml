@@ -222,3 +222,4 @@ newline: lf
 language_extensions:
   - OverloadedStrings
   - MultiParamTypeClasses
+  - FlexibleContexts
