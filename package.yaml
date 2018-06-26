@@ -45,5 +45,7 @@ tests:
     - text-conversions
     - bytestring
     - hspec
-    - hspec-discover
     - text
+    verbatim: |
+      build-tool-depends:
+          hspec-discovery:hspec-discovery
