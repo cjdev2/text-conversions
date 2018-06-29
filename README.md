@@ -25,3 +25,5 @@ Nothing
 [For more details, see the documentation on Hackage.][hackage]
 
 [hackage]: https://hackage.haskell.org/package/text-conversions
+
+[string-conversions](https://hackage.haskell.org/package/string-conversions) is very similar in size and purpose.  Which one you should use may be a matter of taste.
