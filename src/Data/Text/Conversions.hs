@@ -162,7 +162,7 @@ instance FromText (Maybe (Base16 B.ByteString)) where
 #if MIN_VERSION_base16_bytestring(1,0,0)
   fromText txt = case Base16.decode (T.encodeUtf8 txt) of
     Right bs -> Just $ Base16 bs
-    Left   _ -> Nothing
+    Left _   -> Nothing
 #else
   fromText txt = case Base16.decode (T.encodeUtf8 txt) of
     (bs, "") -> Just $ Base16 bs
