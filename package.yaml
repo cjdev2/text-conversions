@@ -25,12 +25,12 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
-  - base >= 4.7 && < 5
-  - bytestring
-  - base16-bytestring
-  - base64-bytestring
-  - errors
-  - text
+  - base >=4.7 && <5
+  - bytestring <1
+  - base16-bytestring <2
+  - base64-bytestring <2
+  - errors <3
+  - text <2
 
 tests:
   text-conversions-test-suite:
