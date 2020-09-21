@@ -161,8 +161,8 @@ instance ToText (Base16 B.ByteString) where
 instance FromText (Maybe (Base16 B.ByteString)) where
 #if MIN_VERSION_base16_bytestring(1,0,0)
   fromText txt = case Base16.decode (T.encodeUtf8 txt) of
-    Right bs -> Just (Base16 bs)
-    Left{} -> Nothing
+    Right bs -> Just $ Base16 bs
+    Left   _ -> Nothing
 #else
   fromText txt = case Base16.decode (T.encodeUtf8 txt) of
     (bs, "") -> Just $ Base16 bs
@@ -179,8 +179,8 @@ instance ToText (Base16 BL.ByteString) where
 instance FromText (Maybe (Base16 BL.ByteString)) where
 #if MIN_VERSION_base16_bytestring(1,0,0)
   fromText txt = case Base16L.decode (TL.encodeUtf8 $ TL.fromStrict txt) of
-    Right bs -> Just (Base16 bs)
-    Left{} -> Nothing
+    Right bs -> Just $ Base16 bs
+    Left _   -> Nothing
 #else
   fromText txt = case Base16L.decode (TL.encodeUtf8 $ TL.fromStrict txt) of
     (bs, "") -> Just $ Base16 bs
