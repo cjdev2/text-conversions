@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (September 29th, 2020)
+
+- Added support for `base16-bytestring-1.0`.
+
 ## 0.3.0 (June 9, 2016)
 
 ### New Features

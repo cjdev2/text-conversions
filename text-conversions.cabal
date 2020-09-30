@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a591622a763977ed27311a7f0a7dc3f30704ab5dbd19358f3a88d2cd576a9e77
+-- hash: 7c0bf9ebe6887baff27c40e9fdb7bb6569b32eac6b9e701e2ab9355feb75353d
 
 name:           text-conversions
-version:        0.3.0
+version:        0.3.1
 synopsis:       Safe conversions between textual types
 description:    Safe conversions between textual types
 category:       Data
