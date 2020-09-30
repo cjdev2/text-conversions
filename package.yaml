@@ -48,4 +48,4 @@ tests:
     - text
     verbatim: |
       build-tool-depends:
-          hspec-discovery:hspec-discovery
+          hspec-discover:hspec-discover

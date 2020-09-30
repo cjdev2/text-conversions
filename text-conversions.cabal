@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bd0737eab6cf997c0af7e9b6161e51a748f86a8525217437445bef5689d0ef2d
+-- hash: a591622a763977ed27311a7f0a7dc3f30704ab5dbd19358f3a88d2cd576a9e77
 
 name:           text-conversions
 version:        0.3.0
@@ -65,4 +65,4 @@ test-suite text-conversions-test-suite
     , text-conversions
   default-language: Haskell2010
   build-tool-depends:
-      hspec-discovery:hspec-discovery
+      hspec-discover:hspec-discover
