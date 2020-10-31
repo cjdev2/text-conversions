@@ -144,6 +144,7 @@ convertText = fromText . toText
 decodeConvertText :: (DecodeText f a, FromText b) => a -> f b
 decodeConvertText = fmap fromText . decodeText
 
+instance ToText   Char    where toText   = T.singleton
 instance ToText   T.Text  where toText   = id
 instance FromText T.Text  where fromText = id
 instance ToText   String  where toText   = T.pack
