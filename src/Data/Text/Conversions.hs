@@ -42,25 +42,28 @@ module Data.Text.Conversions (
   , DecodeText(..)
   , convertText
   , decodeConvertText
+  -- * UTF8 utility methods
+  , fromUTF8
+  , toUTF8
   -- * Encoding newtypes
   , UTF8(..)
   , Base16(..)
   , Base64(..)
   ) where
 
-import Control.Error.Util (hush)
+import           Control.Error.Util          ( hush )
 
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TL
+import qualified Data.Text                   as T
+import qualified Data.Text.Encoding          as T
+import qualified Data.Text.Lazy              as TL
+import qualified Data.Text.Lazy.Encoding     as TL
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString             as B
+import qualified Data.ByteString.Lazy        as BL
 
-import qualified Data.ByteString.Base16 as Base16
+import qualified Data.ByteString.Base16      as Base16
 import qualified Data.ByteString.Base16.Lazy as Base16L
-import qualified Data.ByteString.Base64 as Base64
+import qualified Data.ByteString.Base64      as Base64
 import qualified Data.ByteString.Base64.Lazy as Base64L
 
 {-|
@@ -143,6 +146,42 @@ convertText = fromText . toText
 -}
 decodeConvertText :: (DecodeText f a, FromText b) => a -> f b
 decodeConvertText = fmap fromText . decodeText
+
+{-|
+  A convenience function for the common case of converting from UTF8 bytes
+  to text-like representations.
+
+  >>> fromUTF8 ("hello" :: ByteString) :: Maybe Text
+  Just "hello"
+  >>> fromUTF8 ("invalid \xc3\x28" :: ByteString)) :: Maybe Text
+  Nothing
+-}
+fromUTF8 :: (DecodeText f (UTF8 a), FromText b) => a -> f b
+fromUTF8 = decodeConvertText . UTF8
+{-# INLINEABLE fromUTF8 #-}
+{-# SPECIALIZE INLINE fromUTF8 :: B.ByteString  -> Maybe String  #-}
+{-# SPECIALIZE INLINE fromUTF8 :: B.ByteString  -> Maybe T.Text  #-}
+{-# SPECIALIZE INLINE fromUTF8 :: B.ByteString  -> Maybe TL.Text #-}
+{-# SPECIALIZE INLINE fromUTF8 :: BL.ByteString -> Maybe String  #-}
+{-# SPECIALIZE INLINE fromUTF8 :: BL.ByteString -> Maybe T.Text  #-}
+{-# SPECIALIZE INLINE fromUTF8 :: BL.ByteString -> Maybe TL.Text #-}
+
+{-|
+  A convenience function for the common case of converting to UTF8 bytes
+  from text-like representations.
+
+  >>> toUTF8 ("hello" :: Text) :: ByteString
+  "hello"
+-}
+toUTF8 :: (ToText a, FromText (UTF8 b)) => a -> b
+toUTF8 = unUTF8 . fromText . toText
+{-# INLINEABLE toUTF8 #-}
+{-# SPECIALIZE INLINE toUTF8 :: String  -> B.ByteString  #-}
+{-# SPECIALIZE INLINE toUTF8 :: String  -> BL.ByteString #-}
+{-# SPECIALIZE INLINE toUTF8 :: T.Text  -> B.ByteString  #-}
+{-# SPECIALIZE INLINE toUTF8 :: T.Text  -> BL.ByteString #-}
+{-# SPECIALIZE INLINE toUTF8 :: TL.Text -> B.ByteString  #-}
+{-# SPECIALIZE INLINE toUTF8 :: TL.Text -> BL.ByteString #-}
 
 instance ToText   T.Text  where toText   = id
 instance FromText T.Text  where fromText = id

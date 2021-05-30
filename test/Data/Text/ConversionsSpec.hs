@@ -1,13 +1,15 @@
 module Data.Text.ConversionsSpec (spec) where
 
-import Test.Hspec
-import Data.Text.Conversions
+import           Data.Text.Conversions
+import           Test.Hspec
 
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
+import qualified Data.Text             as T
+import qualified Data.Text.Lazy        as TL
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString       as B
+import qualified Data.ByteString.Lazy  as BL
+
+import           Data.Text.Encoding    ( encodeUtf8 )
 
 newtype Upper = Upper T.Text deriving (Eq, Show)
 newtype Lower = Lower T.Text deriving (Eq, Show)
@@ -87,3 +89,23 @@ spec = do
       it "fails to decode improperly encoded bytestrings" $ do
         decodeConvertText (UTF8 ("invalid \xc3\x28" :: B.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
         decodeConvertText (UTF8 ("invalid \xc3\x28" :: BL.ByteString)) `shouldBe` (Nothing :: Maybe T.Text)
+
+  describe "fromUTF8" $ do
+    it "successfully decodes properly encoded bytestrings" $ do
+      fromUTF8 ("hello" :: B.ByteString) `shouldBe` Just ("hello" :: T.Text)
+      fromUTF8 ("hello" :: B.ByteString) `shouldBe` Just ("hello" :: TL.Text)
+      fromUTF8 ("hello" :: BL.ByteString) `shouldBe` Just ("hello" :: T.Text)
+      fromUTF8 ("hello" :: BL.ByteString) `shouldBe` Just ("hello" :: TL.Text)
+
+    it "fails to decode improperly encoded bytestrings" $ do
+      fromUTF8 ("invalid \xc3\x28" :: B.ByteString) `shouldBe` (Nothing :: Maybe T.Text)
+      fromUTF8 ("invalid \xc3\x28" :: BL.ByteString) `shouldBe` (Nothing :: Maybe T.Text)
+      fromUTF8 ("invalid \xc3\x28" :: B.ByteString) `shouldBe` (Nothing :: Maybe TL.Text)
+      fromUTF8 ("invalid \xc3\x28" :: BL.ByteString) `shouldBe` (Nothing :: Maybe TL.Text)
+
+  describe "toUTF8" $ do
+    it "successfully encodes to bytestrings" $ do
+      toUTF8 ("hello" :: T.Text) `shouldBe` (encodeUtf8 "hello")
+      toUTF8 ("hello" :: TL.Text) `shouldBe` (encodeUtf8 "hello")
+      toUTF8 ("hello" :: T.Text) `shouldBe` (BL.fromStrict $ encodeUtf8 "hello")
+      toUTF8 ("hello" :: TL.Text) `shouldBe` (BL.fromStrict $ encodeUtf8 "hello")
