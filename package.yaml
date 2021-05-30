@@ -21,6 +21,8 @@ default-extensions:
 - FlexibleInstances
 - MultiParamTypeClasses
 - OverloadedStrings
+- FlexibleContexts
+- TypeFamilies
 
 library:
   source-dirs: src
