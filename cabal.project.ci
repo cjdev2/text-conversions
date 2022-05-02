@@ -1,0 +1,4 @@
+package text-conversions
+  ghc-options: -Werror
+  documentation: true
+  tests: true

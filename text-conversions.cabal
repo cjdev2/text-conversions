@@ -1,68 +1,65 @@
-cabal-version: 1.12
+cabal-version: 2.4
+name: text-conversions
+version: 0.3.1
+category: Data
+build-type: Simple
+synopsis: Safe conversions between textual types
+description: Safe conversions between textual types
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
---
--- see: https://github.com/sol/hpack
---
--- hash: 7c0bf9ebe6887baff27c40e9fdb7bb6569b32eac6b9e701e2ab9355feb75353d
-
-name:           text-conversions
-version:        0.3.1
-synopsis:       Safe conversions between textual types
-description:    Safe conversions between textual types
-category:       Data
-homepage:       https://github.com/cjdev/text-conversions#readme
-bug-reports:    https://github.com/cjdev/text-conversions/issues
-author:         Alexis King
-maintainer:     lexi.lambda@gmail.com
-license:        ISC
-license-file:   LICENSE
-build-type:     Simple
+author: Alexis King
+maintainer: Alexis King <lexi.lambda@gmail.com>
+license: ISC
+license-file: LICENSE
 extra-source-files:
-    README.md
-    CHANGELOG.md
-    LICENSE
-    package.yaml
-    stack.yaml
+  README.md
+  CHANGELOG.md
+  LICENSE
+
+homepage: https://github.com/cjdev/text-conversions
+bug-reports: https://github.com/cjdev/text-conversions/issues
 
 source-repository head
   type: git
   location: https://github.com/cjdev/text-conversions
 
-library
-  exposed-modules:
-      Data.Text.Conversions
-  other-modules:
-      Paths_text_conversions
-  hs-source-dirs:
-      src
+common common
+  default-language: Haskell2010
   default-extensions: FlexibleInstances MultiParamTypeClasses OverloadedStrings
   ghc-options: -Wall
+  if impl(ghc >= 8.0.1)
+    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+
+library
+  import: common
+
+  hs-source-dirs: src
+  exposed-modules:
+    Data.Text.Conversions
+
   build-depends:
-      base >=4.7 && <5
+    , base >=4.7 && <5
     , base16-bytestring <2
     , base64-bytestring <2
     , bytestring <1
     , errors <3
     , text <2
-  default-language: Haskell2010
 
 test-suite text-conversions-test-suite
+  import: common
   type: exitcode-stdio-1.0
+
+  hs-source-dirs: test
   main-is: Main.hs
   other-modules:
-      Data.Text.ConversionsSpec
-      Paths_text_conversions
-  hs-source-dirs:
-      test
-  default-extensions: FlexibleInstances MultiParamTypeClasses OverloadedStrings
-  ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N
+    Data.Text.ConversionsSpec
+
+  ghc-options: -rtsopts -threaded -with-rtsopts=-N
+
   build-depends:
-      base
+    , base
     , bytestring
     , hspec
     , text
     , text-conversions
-  default-language: Haskell2010
   build-tool-depends:
-      hspec-discover:hspec-discover
+    hspec-discover:hspec-discover

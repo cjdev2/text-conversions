@@ -1,0 +1,5 @@
+packages: .
+jobs: $ncpus
+
+package text-conversions
+  ghc-options: -j
