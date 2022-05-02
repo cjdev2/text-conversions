@@ -44,7 +44,7 @@ library
     , base64-bytestring <2
     , bytestring <1
     , errors <3
-    , text <2
+    , text <3
   default-language: Haskell2010
 
 test-suite text-conversions-test-suite
