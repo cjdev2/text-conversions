@@ -41,7 +41,6 @@ library
     , base16-bytestring <2
     , base64-bytestring <2
     , bytestring <1
-    , errors <3
     , text <3
 
 test-suite text-conversions-test-suite

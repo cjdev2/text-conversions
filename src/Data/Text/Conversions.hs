@@ -48,8 +48,6 @@ module Data.Text.Conversions (
   , Base64(..)
   ) where
 
-import Control.Error.Util (hush)
-
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.Lazy as TL
@@ -143,6 +141,10 @@ convertText = fromText . toText
 -}
 decodeConvertText :: (DecodeText f a, FromText b) => a -> f b
 decodeConvertText = fmap fromText . decodeText
+
+hush :: Either a b -> Maybe b
+hush (Left  _) = Nothing
+hush (Right x) = Just x
 
 instance ToText   T.Text  where toText   = id
 instance FromText T.Text  where fromText = id
