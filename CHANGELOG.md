@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1.1 (May 2nd, 2022)
+
+- Eliminated dependency on the `errors` package.
+
 ## 0.3.1 (September 29th, 2020)
 
 - Added support for `base16-bytestring-1.0`.

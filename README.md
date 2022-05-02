@@ -1,4 +1,4 @@
-# text-conversions [![Build Status](https://img.shields.io/github/workflow/status/cjdev/text-conversions/build/master)](https://github.com/cjdev/text-conversions/actions/workflows/build.yml) [![Hackage](https://img.shields.io/badge/hackage-0.3.1-5e5184)][hackage]
+# text-conversions [![Build Status](https://img.shields.io/github/workflow/status/cjdev/text-conversions/build/master)](https://github.com/cjdev/text-conversions/actions/workflows/build.yml) [![Hackage](https://img.shields.io/badge/hackage-0.3.1.1-5e5184)][hackage]
 
 This is a small library to ease the pain when converting between the many different string types in Haskell. Unlike some other libraries that attempt to solve the same problem, text-conversions is:
 

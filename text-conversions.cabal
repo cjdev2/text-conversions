@@ -1,6 +1,6 @@
 cabal-version: 2.4
 name: text-conversions
-version: 0.3.1
+version: 0.3.1.1
 category: Data
 build-type: Simple
 synopsis: Safe conversions between textual types
